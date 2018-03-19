@@ -16,7 +16,7 @@ alternatives --install /usr/bin/java java /opt/jdk1.8.0_161/bin/java 2
 alternatives --config java
 
 #Choose java
-1
+ecgo 1
 
 alternatives --install /usr/bin/jar jar /opt/jdk1.8.0_161/bin/jar 2
 alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_161/bin/javac 2
