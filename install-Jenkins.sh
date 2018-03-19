@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#Install epel-release
-yum install -y epel-release
-
 #Update CentOS 7
 yum -y update
 
@@ -35,7 +32,7 @@ export PATH=$PATH:/opt/jdk1.8.0_161/bin:/opt/jdk1.8.0_161/jre/bin
 cd ~ 
 wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
 rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-yum install jenkins
+yum install jenkins -y
 
 #Start and Enable Jenkins Services
 systemctl start jenkins
