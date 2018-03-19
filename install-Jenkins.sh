@@ -30,3 +30,15 @@ alternatives --set javac /opt/jdk1.8.0_161/bin/javac
 export JAVA_HOME=/opt/jdk1.8.0_161
 export JRE_HOME=/opt/jdk1.8.0_161/jre
 export PATH=$PATH:/opt/jdk1.8.0_161/bin:/opt/jdk1.8.0_161/jre/bin
+
+#install jenkins
+cd ~ 
+wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+yum install jenkins
+
+#Start and Enable Jenkins Services
+systemctl start jenkins
+systemctl enable jenkins
+
+
