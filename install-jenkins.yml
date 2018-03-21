@@ -16,12 +16,16 @@
        name: wget
        state: latest
 
-   - name: Download Java
-     command: "wget -q -O {{java_archive}} --no-cookies --no-check-certificate --header 'Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie' {{download_url}}"
-   
+   - name: Download Java JDK
+     get_url:
+       url: "{{download_url}}"
+       dest: "{{java_archive}}"
+
    - name: Unpack archive
-     command: tar xzf /opt/jdk-8u161-linux-x64.tar.gz
-     
+     unarchive:
+       src:  /opt/jdk-8u161-linux-x64.tar.gz
+       dest: /opt/
+
    - name: selected java version
      alternatives:
         name: java
@@ -42,7 +46,7 @@
 
    
    - name: Setup Java Environment Variables
-     command: export JAVA_HOME=/opt/jdk1.8.0_161 | export JRE_HOME=/opt/jdk1.8.0_161/jre | export PATH=$PATH:/opt/jdk1.8.0_161/bin:/opt/jdk1.8.0_161/jre/bin
+     shell: export JAVA_HOME=/opt/jdk1.8.0_161 | export JRE_HOME=/opt/jdk1.8.0_161/jre | export PATH=$PATH:/opt/jdk1.8.0_161/bin:/opt/jdk1.8.0_161/jre/bin
      
    - name: Install Git
      yum: 
@@ -53,7 +57,7 @@
      command: wget -O {{jenkins_folder}} {{jenkins_url}}
 
    - name: rpm install
-     command: rpm --import {{jenkins_rpm}}
+     shell: rpm --import {{jenkins_rpm}}
 
    - name: Install Jenkins
      yum:
