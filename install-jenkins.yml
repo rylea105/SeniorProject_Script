@@ -21,15 +21,25 @@
    
    - name: Unpack archive
      command: tar xzf /opt/jdk-8u161-linux-x64.tar.gz
+     
+   - name: selected java version
+     alternatives:
+        name: java
+        path: /opt/jdk1.8.0_161/bin/java
+        link: /usr/bin/java
 
-   - name: Install Java JDK
-     shell: "alternatives --install /usr/bin/java java /opt/jdk1.8.0_161/bin/java 2 | yes '1' | alternatives --config java" 
+   - name: selected java version
+     alternatives:
+        name: jar
+        path: /opt/jdk1.8.0_161/bin/jar
+        link: /usr/bin/jar
 
-   - name: Install jar
-     command: alternatives --install /usr/bin/jar jar /opt/jdk1.8.0_161/bin/jar 2 | alternatives --set jar /opt/jdk1.8.0_161/bin/jar
+   - name: selected java version
+     alternatives:
+        name: javec
+        path: /opt/jdk1.8.0_161/bin/javac
+        link: /usr/bin/javac
 
-   - name: Install javac
-     command: alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_161/bin/javac 2 | alternatives --set javac /opt/jdk1.8.0_161/bin/javac
    
    - name: Setup Java Environment Variables
      command: export JAVA_HOME=/opt/jdk1.8.0_161 | export JRE_HOME=/opt/jdk1.8.0_161/jre | export PATH=$PATH:/opt/jdk1.8.0_161/bin:/opt/jdk1.8.0_161/jre/bin
