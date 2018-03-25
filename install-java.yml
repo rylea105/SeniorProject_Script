@@ -1,9 +1,0 @@
----
-- hosts: all
-  tasks:
-   - name: selected java version
-     alternatives:
-        name: java
-        path: /opt/jdk1.8.0_161/bin/java
-        link: /usr/bin/java
-
