@@ -1,55 +1,22 @@
 - hosts: web
+
   vars:
     download_url: http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jdk-8u161-linux-x64.rpm
-    download_folder: /opt
     java_path: /usr/java/
     java_name: "{{java_path}}/jdk1.8.0_161"
-    java_archive: "{{java_path}}/jdk-8u161-linux-x64.rpm"
+    java_archive: /usr/java/jdk-8u161-linux-x64.rpm
 
-    jenkins_url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    jenkins_url: http://pkg.jenkins-ci.org/redhat/jenkins.repo
     jenkins_folder: /etc/yum.repos.d/jenkins.repo
-    jenkins_rpm: "{{jenkins_url}}.io.key"
+    jenkins_rpm: https://jenkins-ci.org/redhat/jenkins-ci.org.key
 
 
   tasks:
-   - name: make dir
-     file:
-       path: /usr/java
-       state: directory
-       mode: 755
-
-   - name: Download Java JDK
-     get_url:
-       url: "{{download_url}}"
-       dest: "{{java_archive}}"
-
-   - name: Unpack archive
+   - name: Install Java
      yum:
-       name: "{{java_archive}}"
-       state: installed
-
-   - name: selected java version
-     alternatives:
-        name: java
-        path: "{{java_path}}/jdk1.8.0_161/bin/java"
-        link: /usr/bin/java
-
-   - name: selected jar version
-     alternatives:
-        name: jar
-        path: "{{java_path}}/jdk1.8.0_161/bin/jar"
-        link: /usr/bin/jar
-
-   - name: selected javac version
-     alternatives:
-        name: javec
-        path: "{{java_path}}/jdk1.8.0_161/bin/javac"
-        link: /usr/bin/javac
-     environment:
-        JAVA_HOME: "{{java_path}}/jdk1.8.0_161"
-        JRE_HOME: "{{java_path}}/jdk1.8.0_161/jre"
-        PATH: $PATH:"{{java_path}}/jdk1.8.0_161/bin:{{java_path}}/jdk1.8.0_161/jre/bin"
-  
+      name: java
+      state: latest
+ 
    - name: Install Git
      yum: 
        name: git 
@@ -61,7 +28,9 @@
         dest: "{{jenkins_folder}}"
 
    - name: rpm import
-     shell: rpm --import {{jenkins_rpm}}
+     rpm_key:
+       key: "{{jenkins_rpm}}"
+       state: present
 
    - name: Install Jenkins
      yum:
