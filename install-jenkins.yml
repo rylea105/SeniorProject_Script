@@ -1,9 +1,10 @@
-- hosts: all
+- hosts: web
   vars:
-    download_url: http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jdk-8u161-linux-x64.tar.gz
+    download_url: http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jdk-8u161-linux-x64.rpm
     download_folder: /opt
-    java_name: "{{download_folder}}/jdk1.8.0_161"
-    java_archive: "{{download_folder}}/jdk-8u161-linux-x64.tar.gz"
+    java_path: /usr/java/
+    java_name: "{{java_path}}/jdk1.8.0_161"
+    java_archive: "{{java_path}}/jdk-8u161-linux-x64.rpm"
 
     jenkins_url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
     jenkins_folder: /etc/yum.repos.d/jenkins.repo
@@ -11,10 +12,11 @@
 
 
   tasks:
-   - name: Install wget
-     yum:
-       name: wget
-       state: latest
+   - name: make dir
+     file:
+       path: /usr/java
+       state: directory
+       mode: 755
 
    - name: Download Java JDK
      get_url:
@@ -22,33 +24,31 @@
        dest: "{{java_archive}}"
 
    - name: Unpack archive
-     unarchive:
-       src:  /opt/jdk-8u161-linux-x64.tar.gz
-       dest: /opt/
+     yum:
+       name: "{{java_archive}}"
+       state: installed
 
    - name: selected java version
      alternatives:
         name: java
-        path: /opt/jdk1.8.0_161/bin/java
+        path: "{{java_path}}/jdk1.8.0_161/bin/java"
         link: /usr/bin/java
 
    - name: selected jar version
      alternatives:
         name: jar
-        path: /opt/jdk1.8.0_161/bin/jar
+        path: "{{java_path}}/jdk1.8.0_161/bin/jar"
         link: /usr/bin/jar
 
    - name: selected javac version
      alternatives:
         name: javec
-        path: /opt/jdk1.8.0_161/bin/javac
+        path: "{{java_path}}/jdk1.8.0_161/bin/javac"
         link: /usr/bin/javac
-
-   - name: Set Enviroment
      environment:
-        JAVA_HOME: /opt/jdk1.8.0_161
-        JRE_HOME: /opt/jdk1.8.0_161/jre
-        PATH: $PATH:/opt/jdk1.8.0_161/bin:/opt/jdk1.8.0_161/jre/bin
+        JAVA_HOME: "{{java_path}}/jdk1.8.0_161"
+        JRE_HOME: "{{java_path}}/jdk1.8.0_161/jre"
+        PATH: $PATH:"{{java_path}}/jdk1.8.0_161/bin:{{java_path}}/jdk1.8.0_161/jre/bin"
   
    - name: Install Git
      yum: 
@@ -56,9 +56,11 @@
        state: latest
      
    - name: Download Jenkins Repo
-     command: wget -O {{jenkins_folder}} {{jenkins_url}}
+     get_url:
+        url: "{{jenkins_url}}"
+        dest: "{{jenkins_folder}}"
 
-   - name: rpm install
+   - name: rpm import
      shell: rpm --import {{jenkins_rpm}}
 
    - name: Install Jenkins
