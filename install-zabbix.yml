@@ -1,5 +1,5 @@
 ---
- - hosts: zabbix
+ - hosts: localhost
    vars: 
      DBHost: localhost
      DBName: zabbixdb
@@ -34,22 +34,37 @@
          name: zabbix-proxy-mysql
          state: latest
       
-     - name: Set timezone
-        shell: "sed -i 's/# php_value date.timezone Europe/Riga/php_value date.timezone Asia/Bangkok/g' /etc/httpd/conf.d/zabbix.conf"
-        
+     
+     - name: set timezone
+       replace:
+           path: /etc/httpd/conf.d/zabbix.conf
+           regexp: '# php_value date.timezone Europe/Riga'
+           replace: 'php_value date.timezone Asia/Bangkok'
+           backup: yes
+ 
      - name: restart httpd service        
-        service:
+       service:
           name: httpd
           state: restarted
 
-     - name: set db env
-        shell: mysql -u root -p <<EOF
-CREATE DATABASE zabbixdb CHARACTER SET UTF8;
-GRANT ALL PRIVILEGES on zabbixdb.* to zabbix@localhost IDENTIFIED BY '';
-FLUSH PRIVILEGES;
-quit
-EOF
-      
+     - name: Create DB
+       mysql_db:
+         name: zabbixdb
+         state: present
+
+     - name: GRANT PRIVILEGES
+       mysql_user:
+         name: zabbix
+         password: zabbix
+         priv: '*.*:ALL,GRANT'
+         state: present
+ 
+     - name: zcat
+       shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uroot -p zabbixdb
+    
+     - name: Configure MySQL Database for Zabbix 
+       shell: sed -i 's/# DBHost=localhost/DBHost=localhost/g' /etc/zabbix/zabbix_server.conf | sed -i 's/DBName=zabbix/DBName=zabbixdb/g' /etc/zabbix/zabbix_server.conf | sed -i 's/DBUser=zabbix/DBUser=zabbix/g' /etc/zabbix/zabbix_server.conf | sed -i 's/# DBPassword=/DBPassword=password/g' /etc/zabbix/zabbix_server.conf
+       notify: service zabbix   
 
    handlers:
     - name: service mariadb
