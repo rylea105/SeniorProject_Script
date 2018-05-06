@@ -7,8 +7,7 @@
      - initial_ec2
  
  - hosts: aws_hosts
-   user: centos
-   become: sudo
    gather_facts: false
+   user: centos
    roles:
      - install_nginx 
