@@ -1,0 +1,14 @@
+---
+ - hosts: localhost
+   user: root
+   connection: local
+   gather_facts: false
+   roles:
+     - initial_ec2
+ 
+ - hosts: aws_hosts
+   user: centos
+   become: sudo
+   gather_facts: false
+   roles:
+     - install_nginx 
